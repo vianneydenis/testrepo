@@ -1,0 +1,38 @@
+---
+title: "Practice"
+author: "Benson Shao"
+date: "2024-10-06"
+output: html_document
+---
+
+# 讀取數據，將第一行設為標題
+```{r}
+rairuoho <- read.table("https://www.dipintothereef.com/uploads/3/7/3/5/37359245/rairuoho.txt", header = TRUE)
+```
+
+#載入套件
+```{r}
+library(dplyr)
+library(tidyr)
+```
+
+```{r}
+rairuoho_done <- rairuoho %>%
+  # 1. 將 nutrient 替換為 enriched
+  mutate(treatment = ifelse(treatment == "nutrient", "enriched", treatment)) %>%
+  
+  # 2. 將 day3~8 重整為單一變數，並創建變數 Length
+  pivot_longer(cols = starts_with("day"), names_to = "Day", values_to = "Length") %>%
+  mutate(Day = factor(Day, levels = c("day3", "day4", "day5", "day6", "day7", "day8"))) %>%
+  
+  # 3. 合併 spatial1 和 spatial2， 並移除原先標題
+  unite("Spatial", spatial1, spatial2, sep = "_", remove = TRUE) %>%
+  
+  # 4. 刪除變數: row 和 column 
+  select(-row, -column)
+```
+
+# 查看結果
+```{r}
+rairuoho_done
+```
