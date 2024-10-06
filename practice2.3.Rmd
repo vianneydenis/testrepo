@@ -10,7 +10,7 @@ output: html_document
 rairuoho <- read.table("https://www.dipintothereef.com/uploads/3/7/3/5/37359245/rairuoho.txt", header = TRUE)
 ```
 
-#載入套件
+# 載入套件
 ```{r}
 library(dplyr)
 library(tidyr)
