@@ -1,0 +1,42 @@
+---
+title: "Practice 3.2"
+author: "Benson Shao"
+date: "2024-10-13"
+output: html_document
+---
+
+#Create experiment data
+```{r}
+start_experiment <- c(3.18, 18.18, 12.01, 1.01, 8.12)
+end_experiment <- c(17.10, 16.74, 2.18, 14.10, 16.65)
+data<- data.frame(start_experiment, end_experiment)
+```
+#Rename the row name
+```{r}
+rownames(data) <- c("Plant1", "Plant2", "Plant3", "Plant4", "Plant5")
+```
+#Reformat the data frame (element 1)
+```{r}
+library(tidyr)
+library(dplyr)
+plants<-data %>%
+pivot_longer(c(1:2), names_to = "time", values_to = "height") %>%
+mutate(time = factor(time, levels = c("start_experiment", "end_experiment")))
+str(plants)
+```
+#Create 3 elements of the list "growth" (element 2)
+```{r}
+plant <- rownames(data)
+growth <- (end_experiment - start_experiment) / start_experiment* 100
+combination <- data.frame(plant, growth)
+growth <- list(plant = plant, growth = growth, com = combination)
+```
+#Add arbitrary messages (element 3)
+```{r}
+am <- "Plant 2&3 experienced a decrease in height."
+```
+#Produce the list named my.experiment
+```{r}
+my.experiment <- list(plants = plants, growth = growth, arbitrary_message = am)
+str(my.experiment)
+```
