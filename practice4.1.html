@@ -367,8 +367,7 @@ before next Monday so that I can review your work. The title of your
 email should be: `Practice 4.1 (your name: your student no.). ENJOY
 ;)</strong></p>
 <p>Saving</p>
-<pre class="r"><code>setwd(&quot;C:/Users/Esdeath/Desktop/testrepo&quot;)
-pdf(&quot;iris_data.pdf&quot;, width = 8, height = 5)</code></pre>
+<pre class="r"><code>pdf(&quot;iris_data.pdf&quot;, width = 8, height = 5)</code></pre>
 <p>Select data of each species</p>
 <pre class="r"><code>setosa &lt;- iris[iris$Species == &quot;setosa&quot; ,]
 versicolor &lt;- iris[iris$Species == &quot;versicolor&quot; ,]
@@ -395,8 +394,7 @@ abline(fit)</code></pre>
 <pre class="r"><code>dev.off()</code></pre>
 <pre><code>## pdf 
 ##   3</code></pre>
-<p><strong>Explore the function [pairs] allowing to generate a matrix of
-scatter plots between variables pairs (iris[1:4]).</strong></p>
+<p>Generate the matrix of scatter plots</p>
 <pre class="r"><code>pairs(iris[1:4], 
       main = &quot;Iris data matrix&quot;,
       col = iris$Species,  

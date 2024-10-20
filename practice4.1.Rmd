@@ -8,7 +8,6 @@ output: html_document
 
 Saving
 ```{r}
-setwd("C:/Users/Esdeath/Desktop/testrepo")
 pdf("iris_data.pdf", width = 8, height = 5)
 ```
 
@@ -42,7 +41,7 @@ abline(fit)
 dev.off()
 ```
 
-**Explore the function [pairs] allowing to generate a matrix of scatter plots between variables pairs (iris[1:4]).** 
+Generate the matrix of scatter plots
 ```{r}
 pairs(iris[1:4], 
       main = "Iris data matrix",
