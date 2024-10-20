@@ -1,0 +1,54 @@
+---
+title: "Practice 4.1"
+author: "Benson Shao"
+date: "2024-10-20"
+output: html_document
+---
+**Practice 4.1 Using the iris dataset, reproduce the plot below. Explore the function pairs allowing to generate a matrix of scatter plots between variables pairs (iris[1:4]). You will send me a pdf file of the plot your made. You can also add your code into a .Rmd in which you will import your image and knit it in a .html file. You will email me [vianneydenis@g.ntu.edu.tw] your files (and/or link) before next Monday so that I can review your work. The title of your email should be: `Practice 4.1 (your name: your student no.). ENJOY ;)**
+
+Saving
+```{r}
+setwd("C:/Users/Esdeath/Desktop/testrepo")
+pdf("iris_data.pdf", width = 8, height = 5)
+```
+
+Select data of each species
+```{r}
+setosa <- iris[iris$Species == "setosa" ,]
+versicolor <- iris[iris$Species == "versicolor" ,]
+virginica <- iris[iris$Species == "virginica" ,]
+```
+
+Draw the plot 
+```{r}
+#(1)Use "setosa" to draw the plot
+plot(setosa$Petal.Length, setosa$Petal.Width,
+     xlab = "Petal length (cm)", ylab = 'Petal width (cm)',
+     xlim = range(iris$Petal.Length), ylim = range(iris$Petal.Width), 
+     main = "Petal width vs. length")
+
+#(2)Add the other species to the plot
+points(versicolor$Petal.Length, versicolor$Petal.Width, col = 2, pch = 2)
+points(virginica$Petal.Length, virginica$Petal.Width,  col = 3, pch = 3)
+
+#(3)Add legends
+legend("topleft",legend = c("setosa","versicolor","virginica"), col= 1:3,pch = c(1, 2, 3) ) 
+
+#(4)Add the text and regression line
+text(5, 0.5, "R= 0.96")
+fit <- lm(Petal.Width ~ Petal.Length, data = iris)
+abline(fit)
+
+dev.off()
+```
+
+**Explore the function [pairs] allowing to generate a matrix of scatter plots between variables pairs (iris[1:4]).** 
+```{r}
+pairs(iris[1:4], 
+      main = "Iris data matrix",
+      col = iris$Species,  
+      pch = 4)            
+```
+
+
+
