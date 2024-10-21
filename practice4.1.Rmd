@@ -39,6 +39,12 @@ fit <- lm(Petal.Width ~ Petal.Length, data = iris)
 abline(fit)
 
 dev.off()
+
+# Nice. You can also try to recycle the R value from your fit. Try:
+# r2_value <- summary(fit)$r.squared
+# text(5.5, 0.5, labels = paste("R = ", round(sqrt(r2_value), 2)), pos = 4)
+
+
 ```
 
 Generate the matrix of scatter plots
