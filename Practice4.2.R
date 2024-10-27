@@ -43,5 +43,5 @@ theme(
 labs(title = "Rairuoho Growth Data",
       x = "Times",
       y = "Germination")
-
+ 
 ggsave("rairuoho.pdf", plot = rairuoho_growth, width = 10, height = 6, dpi = 300)
