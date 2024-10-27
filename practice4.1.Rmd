@@ -39,6 +39,13 @@ fit <- lm(Petal.Width ~ Petal.Length, data = iris)
 abline(fit)
 
 dev.off()
+
+
+# correlation coefficient
+# r2_value <- summary(model)$r.squared
+# text(5.5, 0.5, labels = paste("R = ", round(sqrt(r2_value), 2)), pos = 4)
+
+
 ```
 
 Generate the matrix of scatter plots
