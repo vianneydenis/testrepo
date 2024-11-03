@@ -1,0 +1,47 @@
+---
+title: "Practice 5.1"
+author: "Benson Shao"
+date: "2024-11-03"
+output: html_document
+---
+# ⚠ Practice 5.1 Using the rgbif package download data from any species you like. Make a nice map of the distribution of the selected species. Of course you will fix projection problem when plotting you map. You map can be static or interactive.
+
+## *Load required packages*
+```{r}
+library(ggplot2)
+library(rgbif)
+```
+
+## *Download data for Pacific bluefin tuna*
+```{r}
+species_data <- occ_search(scientificName = "Thunnus orientalis", limit = 500, hasCoordinate = TRUE)
+# Extract coordinates
+coords <- data.frame(
+  lon = species_data$data$decimalLongitude,
+  lat = species_data$data$decimalLatitude)
+```
+
+## *Draw the world map*
+```{r, warning = FALSE}
+ggplot(data = coords) +
+  borders("world", fill = "lightgrey", color = "black") +
+  
+  # Points layer with a color gradient based on latitude
+  geom_point(aes(x = lon, y = lat, color = lat), size = 2, alpha = 0.7) +
+  scale_color_gradient(low = "cyan", high = "violet") +
+  
+  # Add Labels
+  labs(
+    title = "Global Distribution of Thunnus orientalis (Pacific Bluefin Tuna)",
+    x = "Longitude", y = "Latitude",
+    color = "Latitude") +
+  
+  # Enhance the theme for clarity
+  theme_void() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    axis.title = element_text(size = 12))
+
+```
+
+
