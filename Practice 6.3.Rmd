@@ -1,0 +1,71 @@
+---
+title: "Practice 6.3"
+author: "Benson Shao"
+date: "2024-11-11"
+output: html_document
+---
+⚠ Practice 6.3 When having two species using the same resources but with different rates of efficiency), we can model their population growth using two linked equations:
+
+### N1t+1=N1t+[growth.rate∗N1t∗(K1−N1t−α12N2tK1)]
+### N2t+1=N2t+[growth.rate∗N2t∗(K2−N2t−α21N1tK2)]
+
+Those equations are known as the Lotka-Volterra equations where K values are the carrying capacities for each of the two species, both α values are competition coefficients that translate the effect of one species on another. Do not worry about this for now, try a range of 0.5 to 1.5, which would indicate that species are fairly similar competitors. I wrote the script, approaching the solution but damn… still not working! Help me to fix the following codes - this time you can look at it! See if you can debug this code that should grow each species alone (no competition), then put the two species interacting. Compare the results of 3 different plot. Note It would be easier if you first focus your attention on the functions of two species competing. Make an animation that makes sense will further be amazing. Send me as usual (in red = to be sent, see 1st class).
+
+## Define the growth function
+```{r}
+simulate_growth <- function(start_1, start_2, growth_rate = 1.2, num_gen = 30) {
+  # Initialize variables
+  N1 <- rep(0, num_gen)
+  N2 <- rep(0, num_gen)
+  K1 <- 100
+  K2 <- 120
+  a12 <- 0.8
+  a21 <- 0.8
+  
+  # Set initial values
+  N1[1] <- start_1
+  N2[1] <- start_2
+  
+  # Calculate population sizes for each generation
+  for (i in 2:num_gen) {
+    N1[i] <- N1[i-1] + (growth_rate * N1[i-1] * ((K1 - N1[i-1] - (a12 * N2[i-1])) / K1))
+    N2[i] <- N2[i-1] + (growth_rate * N2[i-1] * ((K2 - N2[i-1] - (a21 * N1[i-1])) / K2))}
+  
+  # Return data
+  list(N1 = N1, N2 = N2)}
+```
+
+
+## Load the package
+```{r}
+library(animation)
+```
+
+## Save the animation
+```{r}
+saveGIF({
+  # Set parameters
+  num_gen <- 30
+  growth_rate <- 1.2
+  
+  # Simulate growth data for two competing species
+  growth_data <- simulate_growth(1, 1, growth_rate, num_gen)
+  N1 <- growth_data$N1
+  N2 <- growth_data$N2
+  
+  # Animation plotting
+  for (i in 1:num_gen) {
+    plot(1:num_gen, N1, type = "n", ylim = c(0, max(c(N1, N2))), 
+         xlab = "Generation", ylab = "Population Size",
+         main = "Competition Between Two Species")
+    
+    # Plot growth curve for species 1
+    lines(1:i, N1[1:i], type = "b", col = "blue", pch = 19, lty = 1, lwd = 2)
+    
+    # Plot growth curve for species 2
+    lines(1:i, N2[1:i], type = "b", col = "red", pch = 19, lty = 1, lwd = 2)
+    
+    # Add legend
+    legend("topright", legend = c("Species 1", "Species 2"), col = c("blue", "red"), lty = 1, pch = 19)
+    }}, interval = 0.1, ani.width = 600, ani.height = 400)
+```
