@@ -36,7 +36,7 @@ water_data <- subset(rairuoho, treatment == "water")
 ```{r}
 # Nutrient
 nutrient_day3_day4 <- pearson.test(nutrient_data$day3, nutrient_data$day4)
-nutrient_day3_day8 <- pearson.test(nutrient_data$day3, nutrient_data$day8)
+nutrient_day3_day8 <- pearson.test(nutrient_data$day3, nutrient_data$day8) ### Not significant
 
 # Water
 water_day3_day4 <- pearson.test(water_data$day3, water_data$day4)
@@ -64,7 +64,7 @@ plot_regression <- function(data, x_var, y_var, treatment_filter, title) {
 # nutrient: day3 & 4
 plot1 <- plot_regression(rairuoho, "day3", "day4", "nutrient", "Nutrient: day3 & 4")
 
-# nutrient: day3 & 8
+# nutrient: day3 & 8 (should not be plotted as not significant)
 plot2 <- plot_regression(rairuoho, "day3", "day8", "nutrient", "Nutrient: day3 & 8")
 
 # water: day3 & 4
