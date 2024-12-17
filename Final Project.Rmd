@@ -48,7 +48,7 @@ hist(log(data70$HRA),
      breaks = 20)
 ```
 
-#### After processing, the histogram shows that the data approximately follows a normal distribution.
+#### After processing, the histograms show that the data approximately follows a normal distribution.
 
 ### **Linear model**
 We first predict home range area using only one variable (body length) to see whether it (log-transformed) significantly influences the home range area (also log-transformed) of marine fish.
@@ -68,7 +68,7 @@ plot(linear_model, which = 2)
 
 #### The residuals approximately follow a normal distribution, though slight deviations are present. The histogram shows that the residuals are symmetrically distributed, while the Q-Q plot reveals that most data points align along the theoretical normal distribution line. However, deviations occur at the tails, indicating the noticeable influence of extreme values.
 
-Use plot and regression line to display the fitting of the linear model.
+Use dot plot and regression line to display the fitting of the linear model.
 ```{r,warning = F, message = F}
 r_squared <- summary(linear_model)$r.squared
 library(ggplot2)
