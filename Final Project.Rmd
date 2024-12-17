@@ -1,0 +1,174 @@
+---
+title: "Final Project"
+author: "Benson Shao"
+date: "2024-12-16"
+output: html_document
+---
+# The Role of Body Length in Predicting Home Range Size of Marine Fish
+### Members: 徐顥書(R12241201)、賀子軒(R13241204)、邵辰平(R13241208)
+
+## Introduction
+1. According to metabolic theory, when an organism's body length increases tenfold, its body mass increases a thousandfold, requiring significantly more energy to sustain its cells. Body mass plays a critical role in determining home range size, as the latter is largely influenced by energy requirements and metabolic rates (Tamburello et al., 2015).
+2. In extreme marine environments, such as the deep sea, organisms exhibit deep-sea gigantism. Larger body sizes reduce basal metabolic rates per unit volume, enabling survival in cold, high-pressure, and food-scarce conditions(JE, 2021). 
+3. These observations highlight the relationship between body size, energy requirements, and lifestyle.
+4. The body size of a species has been shown to be a significant predictor of home range area (e.g. Harestad and Bunnel 1979; Lindstedt et al. 1986). 
+5. To date, the majority of home range–body size relationships studies have focused on mammals, leaving these relationships largely unevaluated within fishes and invertebrates (Hendriks et al. 2009).
+6. Thus, we aim to analyze the relationship between body length and home range across different fish species.
+
+
+### **Hypothesis**
+	1.	Body length and body mass exhibit a positive correlation in fish species.
+	2.	Body length may serve as a significant predictor of home range area in marine fish(positive correlation).
+
+
+## Methods & Results
+
+### **Data Manipulation**
+To investigate the effect of body length on the home range area (HRA) of marine fish, we analyzed data from https://www.nature.com/sdata/. We only used the first 70 rows of the data since the predicted home range was not what we were interested in. We first transformed observed home range area’s unit from km² to m² (Tamburello et al. 2015). Then we log transformed home range area and body length to reduce extreme qualitative impacts  and better approach the assumption of normality for the later analysis(Tamburello et al. 2015).
+```{r,warning = F, message = F}
+library(dplyr)
+setwd("C:/Users/Esdeath/Downloads")
+data = read.csv("homerange_rf_predictions.csv")
+data <- mutate(data, HRA= observed_homerange*10^6)
+data70 <- data[1:70, ]
+data70 <- mutate(data70, log_length = log(length))
+```
+
+```{r}
+par(mfrow = c(1, 2))
+hist(data70$log_length, 
+     main = "Distribution of Log Length", 
+     xlab = "Log Length", 
+     col = "skyblue", 
+     breaks = 20)
+hist(log(data70$HRA), 
+     main = "Distribution of HRA", 
+     xlab = "HRA", 
+     col = "skyblue", 
+     breaks = 20)
+```
+
+#### After processing, the histogram shows that the data approximately follows a normal distribution.
+
+### **Linear model**
+We first predict home range area using only one variable (body length) to see whether it (log-transformed) significantly influences the home range area (also log-transformed) of marine fish.
+```{r}
+linear_model <- lm(log(HRA) ~ log_length, data = data70)
+summary(linear_model)
+```
+#### The results show a significant positive relationship between body length and home range area (Estimate = 4.2259, p < 0.001). The model explains approximately 33.7% of the variance in home range size (R² = 0.3373), indicating that body length is a significant predictor.
+
+Use residuals plots to see whether this linear model is reliable.
+```{r}
+par(mfrow = c(1, 3))
+plot(linear_model, which = 1)
+hist(linear_model$residuals) 
+plot(linear_model, which = 2)
+```
+
+#### The residuals approximately follow a normal distribution, though slight deviations are present. The histogram shows that the residuals are symmetrically distributed, while the Q-Q plot reveals that most data points align along the theoretical normal distribution line. However, deviations occur at the tails, indicating the noticeable influence of extreme values.
+
+Use plot and regression line to display the fitting of the linear model.
+```{r,warning = F, message = F}
+r_squared <- summary(linear_model)$r.squared
+library(ggplot2)
+ggplot(data = data70, aes(x = log_length, y = log(HRA))) +
+  geom_point(alpha = 0.6, size = 2) + 
+  geom_smooth(method = "lm", se = TRUE,  alpha = 0.2)+
+  annotate("text", x = 4, y = 25,
+           label = paste("R² =", round(r_squared, 2)))
+```
+
+#### Body length explains 34 % of the variation, but the positive correlation is still significant. 
+
+### **ANOVA**
+Different migratory behavior such as highly migratory species or species that are territorial with limited territory size and different habitats may have different results to their home range area. First, we remove Lagoon habitat since it only has one sample. Then, we use box plot to see the difference between each movement_keyword groups, and use Bartlett.test to see whether our data had met the ANOVA assumptions.
+```{r}
+filtered_data <- subset(data70, movement_keyword != "habitat_lagoon")
+ggplot(data = filtered_data, aes(x = movement_keyword , y = log(HRA))) +
+      geom_boxplot() 
+bartlett.test(log(HRA) ~ movement_keyword, data = filtered_data) 
+```
+
+#### P value is large enough ( > 0.05).
+
+Use ANOVA to detect differences between groups, and plot it to check this ANOVA result.
+```{r}
+hra.aov <- aov(log(HRA) ~ movement_keyword, data = filtered_data)
+summary(hra.aov)
+par(mfrow = c(1, 3))
+hist(hra.aov$residuals)
+plot(hra.aov, which = 2)
+plot(hra.aov, which = 1)
+```
+
+#### Residuals approximately follow a normal distribution.
+
+Then, use Tukey's t-test to further determine whether there is significant variation between specific groups.
+```{r}
+TukeyHSD(hra.aov)
+```
+#### The living range (HRA) of the hms group is obviously different from other groups, which may be related to its highly migratory ecological behavior or biological characteristics.
+
+### **Mixed model**
+Since different movement_keyword groups have different home range area significantly, we therefore considered movement_keyword as random effects in order to generalize the trend between body length and home range area. Then, use confint() to check whether the 95% confidence intervals do not overlap 0. 
+```{r,warning = F, message = F}
+library(lme4)
+mix_model_movemix <- lmer(log(HRA) ~ log_length + (1 | movement_keyword), data = data70, REML = TRUE)
+summary(mix_model_movemix)
+confint(mix_model_movemix, parm = "theta_", level = 0.95)
+```
+
+#### The estimate of log_length is 1.8197 and the t-value is significant, making it a significant predictor. It follows from the variance of the random effects that (movement_keyword) must also be taken into account, since it effectively captures the variability between groups.
+
+Check the mixed model's residuals by plots.
+```{r}
+par(mfrow = c(1, 2))
+qqnorm(residuals(mix_model_movemix))
+scatter.smooth(residuals(mix_model_movemix) ~ fitted(mix_model_movemix))
+```
+
+### **AIC**
+Comparing these two models by applying AIC
+```{r}
+mix_model_movemix_1 <- lmer(log(HRA) ~ log_length + (1 | movement_keyword), data = data70, REML = F)
+AIC(linear_model, mix_model_movemix_1)
+```
+
+#### Since the mixed model had a lower AIC score, we can conclude that the mixed model which considered movement and habitats as random effect is better than simple linear regression when predicting home range area by body length.
+
+Regression lines of each movement_keyword groups.
+```{r message = F}
+ggplot(data = data70, aes(x = log_length, y = log(HRA), color = movement_keyword)) +
+  geom_point(alpha = 0.6, size = 2) + 
+  geom_smooth(method = "lm", se = TRUE, aes(group = movement_keyword), alpha = 0.2)
+```
+
+#### The regression lines for different movement_keyword categories exhibit varying relationships. Categories showing a positive correlation include territorial, coastal, reef, and migratory, while the trend for hms remains relatively flat. Additionally, benthic displays a negative correlation. This chart illustrates that the relationship between activity range and body length varies across categories.
+
+## Discussion & Conclusion
+1.	Body length does have a significant effect on marine fish's’ home range area. 
+2.	The correlation between marine fish's body length and home range area is also positive, so the longer the body length, the larger the home range area.
+3.	Different migratory behavior and habitats among marine fishes indeed influence this analysis. Therefore, using a mixed-effects model is more appropriate as it accounts for the variability between groups while focusing on the primary relationship of interest.
+4.	In the visualization analysis, it can be seen that in all habitats, the body length and home range of benthic fishes show a negative correlation. This is in contrast to the results from other habitats. We discussed and speculated that the reason may be the different foraging methods of benthic fishes. They opportunistically collect detritus that settles on the substrate, so larger body sizes may allow them to reduce their movement range.
+
+## References
+•Bradley D, Caughman AM, Fogg SA, Cabral RB, Mayorga J, Goodell W, Millage KD& White TD (2024) Marine Fish Movement: home range sizes for commercially relevant species. Sci Data 11, 865
+
+•Duffy JE (2021) Ocean Ecology: Marine Life in the Age of
+Humans. Princeton University Press Princeton, New Jersey, pp.276 - 295
+
+•Harestad AS, Bunnel FL (1979) Home range and body weight: a reevaluation. Ecology 60:389–402.
+
+•Hendriks AJ, Willers BJC, Lenders HJR, Leuven RSEW (2009) Towards a coherent allometric framework for individual home ranges, key population patches and geographic ranges. Ecography 32:929–942.
+
+•Lindstedt SL, Miller BJ, Buskirk SW (1986) Home range, time, and body size in mammals. Ecology 67:413–418.
+
+•Tamburello N, Côté IM& Dulvy NK (2015) Energy and the Scaling of Animal Space Use. Am. Nat 186: 196-211
+
+
+
+
+
+
+
